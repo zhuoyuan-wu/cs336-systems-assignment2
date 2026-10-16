@@ -6,7 +6,7 @@ from cs336_systems.rmsnorm_triton import RMSNormAutogradTriton
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
-# 采用适度的数据量，既能压榨性能，又不会撑爆 8GB 显存
+# 采用适度的数据量
 num_rows = 50000
 hidden_dims = [1024, 2048, 4096]
 num_trials = 50
@@ -22,7 +22,7 @@ for h in hidden_dims:
     ln = nn.LayerNorm(h).to(device)
     # 2. Assignment 1 原生 RMSNorm
     rms_pt = RMSNorm(hidden_size=h).to(device)
-    # 3. 你手写的 Triton 算子
+    # 3. Triton 算子
     f_triton = RMSNormAutogradTriton.apply
 
     # Warmup
@@ -46,7 +46,7 @@ for h in hidden_dims:
     torch.cuda.synchronize()
     t_pt = (timeit.default_timer() - t0) * 1000.0 / num_trials
 
-    # 测 你的 Triton RMSNorm
+    # 测 Triton RMSNorm
     t0 = timeit.default_timer()
     for _ in range(num_trials):
         _ = f_triton(x, w)

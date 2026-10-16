@@ -40,7 +40,7 @@ def profile_model(model_size="small", mode="forward", num_steps=3):
 
     inputs = torch.randint(0, 10000, (16, 128), device=device)
 
-    # 1. 必须预热 1 步
+    # 1. 预热 1 步
     run_step(model, inputs, mode=mode)
     torch.cuda.synchronize()
 
@@ -69,16 +69,15 @@ def profile_model(model_size="small", mode="forward", num_steps=3):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--profile", action="store_true", help="是否启动 PyTorch Profiler 详细剖析")
-    parser.add_argument("--model_size", type=str, default="small")
+    parser.add_argument("--model_size", type=str, default="small", choices=list(MODEL_CONFIGS.keys()))
     parser.add_argument("--mode", type=str, default="forward", choices=["forward", "both"])
     args = parser.parse_args()
 
     if args.profile:
         profile_model(model_size=args.model_size, mode=args.mode)
     else:
-        # 明确打印出 CUDA 内核耗时和调用次数
-        print(prof.key_averages().table(
-            sort_by="cuda_time_total",
-            row_limit=25,
-            max_name_column_width=45
-        ))
+        print(f"正在以普通测速模式运行 {args.model_size}...")
+      
+        from benchmark import run_step
+        
+        profile_model(model_size=args.model_size, mode=args.mode, num_steps=5)

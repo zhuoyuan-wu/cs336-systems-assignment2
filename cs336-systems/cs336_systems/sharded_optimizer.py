@@ -22,7 +22,7 @@ class ShardedOptimizer(Optimizer):
         # 初始化基类，在顶层维护完整的 param_groups 视图
         super().__init__(params, kwargs)
 
-        # 按照 Round-Robin (轮询切分) 将参数均分到各个 rank
+        # 按照 轮询切分 将参数均分到各个 rank
         # 仅将分配到当前 rank 的分片传递给底层的物理优化器实例
         local_param_groups = []
         for group in self.param_groups:

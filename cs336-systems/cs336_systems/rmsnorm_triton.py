@@ -3,7 +3,7 @@ import triton
 import triton.language as tl
 
 
-# 1. 前向传播 Triton Kernel (一次性加载到 SRAM，一锅算完)
+# 1. 前向传播 Triton Kernel (一次性加载到 SRAM)
 
 @triton.jit
 def _rmsnorm_fwd_kernel(

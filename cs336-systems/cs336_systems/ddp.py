@@ -5,7 +5,7 @@ from typing import Optional, List
 
 class DDPIndividualParameters(nn.Module):
     """
-    逐参数异步通信的 DDP 容器 (Page 25-26)
+    逐参数异步通信的 DDP 容器 
     在反向传播时，每当一个参数的梯度算完，立即触发异步 All-Reduce。
     """
     def __init__(self, module: nn.Module):
@@ -52,7 +52,7 @@ class DDPIndividualParameters(nn.Module):
 
 class DDPBucketed(nn.Module):
     """
-    梯度分桶 (Bucketing) 的 DDP 容器 (Page 27-28)
+    梯度分桶 (Bucketing) 的 DDP 容器、
     将小张量融合成大块 (Bucket) 进行通信，最大化利用带宽并降低通信开销。
     """
     def __init__(self, module: nn.Module, bucket_size_mb: Optional[float] = 25.0):
@@ -66,7 +66,7 @@ class DDPBucketed(nn.Module):
             for param in self.module.parameters():
                 dist.broadcast(param.data, src=0)
 
-        # 2. 按照参数倒序进行分桶 (反向传播是从后往前的)
+        # 2. 按照参数倒序进行分桶 反向传播 从后往前
         self.buckets = []
         self._create_buckets()
         self._register_hooks()
@@ -111,7 +111,7 @@ class DDPBucketed(nn.Module):
             b_idx = self.param_to_bucket_idx[p]
             self.bucket_ready_count[b_idx] += 1
 
-            # 当前 bucket 内所有参数都就绪了，立即发射通信！
+            # 当前 bucket 内所有参数就绪，立即发射通信！
             if self.bucket_ready_count[b_idx] == len(self.buckets[b_idx]):
                 bucket_params = self.buckets[b_idx]
                 # 拼接扁平化张量 (Flatten)
